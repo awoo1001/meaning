@@ -1,35 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:flutter/widgets.dart';
+import 'package:imagewordwise/meansentence.dart';
 
-class textscren extends StatefulWidget {
-  String textt;
-   textscren({
-    super.key,
-    required this.textt
-    });
+class TextScreen extends StatefulWidget {
+  final String text;
+  
+  const TextScreen({super.key, required this.text});
 
   @override
-  State<textscren> createState() => _textscrenState();
+  State<TextScreen> createState() => _TextScreenState();
 }
 
-class _textscrenState extends State<textscren> {
+final String texto="";
+class _TextScreenState extends State<TextScreen> {
+  @override
+  void initState() {
+    super.initState();
+    printText();
+  }
+
+  void printText() {
+    print(widget.text);
+  }
 
   @override
   Widget build(BuildContext context) {
-     
     return Scaffold(
-          
       body: Column(
         children: [
-         
-         SizedBox(height: 20),
-      
-                Text(widget.textt,
-                style: TextStyle(
-                 fontSize: 20.0
-                ),
-                ),
+          const SizedBox(height: 20),
+          Text(
+            widget.text,
+            style: const TextStyle(fontSize: 20.0),
+          ),
 
+          InkWell(
+           child: const Icon(Icons.arrow_forward_rounded, size: 40),
+          onTap: ()
+          {
+                 Navigator.push(context,MaterialPageRoute(builder: (context)=>VocabularyScreen(texto:widget.text)),);
+          } 
+          )
         ],
       ),
     );
