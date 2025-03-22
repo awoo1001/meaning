@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:imagewordwise/textscreeen.dart';
@@ -18,77 +17,67 @@ class RecogniseImage extends StatefulWidget {
 }
 
 class _RecogniseImageState extends State<RecogniseImage> {
-
   late TextRecognizer textRecognizer;
+  String textt = "";
+
   @override
   void initState() {
-      
-      textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
-      dotextrecognition();
     super.initState();
+    textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+    Future.microtask(() => dotextrecognition());
   }
 
+  Future<void> dotextrecognition() async {
+    final InputImage inputImage = InputImage.fromFile(widget.imagee);
+    final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
-String text="";
-  dotextrecognition() async
-  {
-      InputImage inputImage=InputImage.fromFile(this.widget.imagee);
-      
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+    setState(() {
+      textt = recognizedText.text;
+    });
 
-    //  print(recognizedText);
-
-String text = recognizedText.text;
-
-print(text);
-//print("object");
-
-for (TextBlock block in recognizedText.blocks) {
-  final Rect rect = block.boundingBox;
-  final List<Point<int>> cornerPoints = block.cornerPoints;
-  final String text = block.text;
-  final List<String> languages = block.recognizedLanguages;
-
-  for (TextLine line in block.lines) {
-    // Same getters as TextBlock
-    for (TextElement element in line.elements) {
-      // Same getters as TextBlock
-    }
+    print(textt);
   }
-}
 
+  @override
+  void dispose() {
+    textRecognizer.close();
+    super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(' '),
-        backgroundColor: Color.fromARGB(255, 255, 238, 2),
+        title: const Text('Recognized Text'),
+        backgroundColor: const Color.fromARGB(255, 255, 238, 2),
       ),
-      body: Column(
-        children: [
-          SizedBox(height: 70),
-          Center(
-            child: Image.file(widget.imagee), 
-          ),
-         
-         SizedBox(height: 130),
-          
-          Row(
-            children: [
-              SizedBox(width: 334),
-
-              InkWell(
-                child: Icon(Icons.arrow_forward_rounded,
-                size: 40),
-                onTap: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>textscren(textt:text)));
-                },
-              ),
-              
-            ],
-          )
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 70),
+            Center(
+              child: Image.file(widget.imagee),
+            ),
+            const SizedBox(height: 130),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                InkWell(
+                  child: const Icon(Icons.arrow_forward_rounded, size: 40),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TextScreen(text: textt),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 20),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
